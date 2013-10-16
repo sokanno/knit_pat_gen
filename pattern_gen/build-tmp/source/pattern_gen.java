@@ -73,26 +73,8 @@ public void setup() {
   }
 }
 
-public void controlEvent(ControlEvent theControlEvent) {
-  if (theControlEvent.isFrom("rangeController")) {
-    // min and max values are stored in an array.
-    // access this array with controller().arrayValue().
-    // min is at index 0, max is at index 1.
-    element_0 = PApplet.parseInt(theControlEvent.getController().getArrayValue(0));
-    element_1 = PApplet.parseInt(theControlEvent.getController().getArrayValue(1));
-    // println("range update, done.");
-    for (int i=0; i<interval; i++) {
-      if (i%element_1 < element_0) materialArray[i] = true;
-      else materialArray[i] = false;
-    }
-  }
-}
-
 public void draw() {
   background(96);
-  // fill(255);
-  // text("pattern generator for machine knitting", 30, 20);
-
   //make a pixel array
   for (int i=0; i<row; i++) {
     for (int j=0; j<column; j++) {
@@ -120,16 +102,21 @@ public void draw() {
     }
   }
   stroke(64);
+}
 
-  //display the small image to export
-  img.loadPixels();
-  for (int i=0; i<row; i++) {
-    for (int j=0; j<column; j++) {
-      if (pixelBool[i][j]) img.pixels[i*row+j] = color(255);
-      else img.pixels[i*row+j] = color(0);
+public void controlEvent(ControlEvent theControlEvent) {
+  if (theControlEvent.isFrom("rangeController")) {
+    // min and max values are stored in an array.
+    // access this array with controller().arrayValue().
+    // min is at index 0, max is at index 1.
+    element_0 = PApplet.parseInt(theControlEvent.getController().getArrayValue(0));
+    element_1 = PApplet.parseInt(theControlEvent.getController().getArrayValue(1));
+    // println("range update, done.");
+    for (int i=0; i<interval; i++) {
+      if (i%element_1 < element_0) materialArray[i] = true;
+      else materialArray[i] = false;
     }
   }
-  img.updatePixels();
 }
 
 public void keyPressed() {
@@ -158,6 +145,14 @@ public void mousePressed() {
 }
 
 public void export_image() {
+  img.loadPixels();
+  for (int i=0; i<row; i++) {
+    for (int j=0; j<column; j++) {
+      if (pixelBool[i][j]) img.pixels[i*row+j] = color(255);
+      else img.pixels[i*row+j] = color(0);
+    }
+  }
+  img.updatePixels();
   selectOutput("Select a file to write to:", "fileOutput");
 }
 

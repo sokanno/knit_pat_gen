@@ -7,11 +7,12 @@ Range range;
 int row = 100;
 int column = 100;
 boolean [][] pixelBool = new boolean [row][column];
+int [][] lastPixelBool = new int [row][column];
 int rectSize = 500;
 int res = rectSize/row;
 int horizonMargin = 20;
 int topMargin = 20;
-int bottomMargin = 60;
+int bottomMargin = 100;
 int colorVal;
 int maxInterval = 10000;
 int interval = 1000;
@@ -21,6 +22,8 @@ boolean [] editMaterialArray = new boolean [maxInterval];
 int element_0 = 10; 
 int element_1 = 20;
 int rangeLimit = 100;
+
+boolean lifegameFlag = false;
 
 void setup() {
   size(rectSize + horizonMargin*2, rectSize + topMargin +bottomMargin);
@@ -46,7 +49,12 @@ void setup() {
       .setSize(90, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-
+  cp5.addButton("lifegame")
+    .setPosition(horizonMargin, rectSize+topMargin+60)
+      .setSize(90, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  // customize(presetSelector); // customize the first list
   img = createImage(row, column, HSB);
   textSize(10);
   for (int i=0; i<interval; i++) {
@@ -58,11 +66,13 @@ void setup() {
 void draw() {
   background(96);
   //make a pixel array
-  for (int i=0; i<row; i++) {
-    for (int j=0; j<column; j++) {
-      if(editMaterialArray[(i*row+j) % interval] == false){
-        pixelBool[i][j] = materialArray[ (i*row+j) % interval ];
-      }else pixelBool[i][j] = !materialArray[ (i*row+j) % interval ];
+  if(!lifegameFlag){
+    for (int i=0; i<row; i++) {
+      for (int j=0; j<column; j++) {
+        if(editMaterialArray[(i*row+j) % interval] == false){
+          pixelBool[i][j] = materialArray[ (i*row+j) % interval ];
+        }else pixelBool[i][j] = !materialArray[ (i*row+j) % interval ];
+      }
     }
   }
 
@@ -83,7 +93,6 @@ void draw() {
       rect(horizonMargin+j*res, topMargin+i*res, res, res);
     }
   }
-  stroke(64);
 }
 
 void controlEvent(ControlEvent theControlEvent) {
@@ -93,7 +102,6 @@ void controlEvent(ControlEvent theControlEvent) {
     // min is at index 0, max is at index 1.
     element_0 = int(theControlEvent.getController().getArrayValue(0));
     element_1 = int(theControlEvent.getController().getArrayValue(1));
-    // println("range update, done.");
     for (int i=0; i<interval; i++) {
       if (i%element_1 < element_0) materialArray[i] = true;
       else materialArray[i] = false;
@@ -107,6 +115,7 @@ void keyPressed() {
     if (keyCode == LEFT && interval > 1) interval--;	
     if (keyCode == DOWN && interval < maxInterval) interval+=row;
     if (keyCode == UP && interval > row) interval-=row;
+    lifegameFlag = false;
   }
   boolean [] materialArray = new boolean [interval];
 }
@@ -123,8 +132,40 @@ void mousePressed() {
       xyPos = xyPos % interval;
     }
     editMaterialArray[xyPos] = !editMaterialArray[xyPos];
+    lifegameFlag = false;
   }
 }
+
+void lifegame(){
+  lifegameFlag = true;
+  for(int i=0; i<row; i++){
+    for(int j=0; j<column; j++){
+      lastPixelBool[i][j] = int(pixelBool[i][j]);
+    }
+  }
+  for(int i=1; i<row-1; i++){
+    for(int j=1; j<column-1; j++){
+      // pixelBool[i][j] = true;
+      int state = lastPixelBool[i-1][j] + lastPixelBool[i+1][j]
+                 +lastPixelBool[i][j-1] + lastPixelBool[i][j+1]
+                 +lastPixelBool[i+1][j-1] + lastPixelBool[i+1][j+1]
+                 +lastPixelBool[i-1][j-1] + lastPixelBool[i-1][j+1];
+
+      if(pixelBool[i][j] == true && state == 3 || state == 2){
+        pixelBool[i][j] = true;
+      }
+      else if(pixelBool[i][j] == true && state > 4){
+        pixelBool[i][j] = false;
+      }
+      else if(pixelBool[i][j] == false && state == 3){
+        pixelBool[i][j] = true;
+      }
+      else pixelBool[i][j] = false;
+    }
+  }
+  // lifegameFlag = false;  
+}
+
 
 void export_image() {
   img.loadPixels();
