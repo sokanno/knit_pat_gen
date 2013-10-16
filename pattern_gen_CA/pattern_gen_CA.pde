@@ -102,9 +102,11 @@ void controlEvent(ControlEvent theControlEvent) {
     // min is at index 0, max is at index 1.
     element_0 = int(theControlEvent.getController().getArrayValue(0));
     element_1 = int(theControlEvent.getController().getArrayValue(1));
+    if(element_1 == 0) element_1 = 1;
     for (int i=0; i<interval; i++) {
       if (i%element_1 < element_0) materialArray[i] = true;
       else materialArray[i] = false;
+      lifegameFlag = false;
     }
   }
 }
@@ -138,6 +140,38 @@ void mousePressed() {
 
 void lifegame(){
   lifegameFlag = true;
+
+  // // //end connect to the other end version (haven't done)
+  // for(int i=0; i<row*3; i++){
+  //   for(int j=0; j<column*3; j++){
+  //     lastPixelBool[i][j] = int(pixelBool[i%row][j%column]);
+  //     // if(i==0 && j==column-1) println("ussu");
+  //   }
+  // }
+  // for(int i=row; i<row*2; i++){
+  //   for(int j=column; j<column*2; j++){
+  //     int state = lastPixelBool[i-1][j] + lastPixelBool[i+1][j]
+  //                +lastPixelBool[i][j-1] + lastPixelBool[i][j+1]
+  //                +lastPixelBool[i+1][j-1] + lastPixelBool[i+1][j+1]
+  //                +lastPixelBool[i-1][j-1] + lastPixelBool[i-1][j+1];
+
+  //     if(pixelBool[i%row][j%column] == true && state == 3 || state == 2){
+  //       pixelBool[i%row][j%column] = true;
+  //     }
+  //     else if(pixelBool[i%row][j%column] == true && state < 2){
+  //       pixelBool[i%row][j%column] = false;
+  //     }
+  //     else if(pixelBool[i%row][j%column] == true && state > 4){
+  //       pixelBool[i%row][j%column] = false;
+  //     }
+  //     else if(pixelBool[i%row][j%column] == false && state == 3){
+  //       pixelBool[i%row][j%column] = true;
+  //     }
+  //     else pixelBool[i%row][j%column] = false;
+  //   }
+  // }
+
+  //end is the wall version
   for(int i=0; i<row; i++){
     for(int j=0; j<column; j++){
       lastPixelBool[i][j] = int(pixelBool[i][j]);
@@ -145,25 +179,30 @@ void lifegame(){
   }
   for(int i=1; i<row-1; i++){
     for(int j=1; j<column-1; j++){
-      // pixelBool[i][j] = true;
       int state = lastPixelBool[i-1][j] + lastPixelBool[i+1][j]
                  +lastPixelBool[i][j-1] + lastPixelBool[i][j+1]
                  +lastPixelBool[i+1][j-1] + lastPixelBool[i+1][j+1]
                  +lastPixelBool[i-1][j-1] + lastPixelBool[i-1][j+1];
 
-      if(pixelBool[i][j] == true && state == 3 || state == 2){
-        pixelBool[i][j] = true;
-      }
-      else if(pixelBool[i][j] == true && state > 4){
-        pixelBool[i][j] = false;
-      }
+      if(pixelBool[i][j] == true){
+        if(state == 3 || state == 2){
+          pixelBool[i][j] = true;
+        }
+        else if(state < 2){
+          pixelBool[i][j] = false;
+        }
+        else if(state > 3){
+          pixelBool[i][j] = false;
+        }
+      }      
       else if(pixelBool[i][j] == false && state == 3){
         pixelBool[i][j] = true;
       }
-      else pixelBool[i][j] = false;
+      else{
+        pixelBool[i][j] = false;
+      }
     }
   }
-  // lifegameFlag = false;  
 }
 
 
