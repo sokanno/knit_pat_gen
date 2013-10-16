@@ -16,6 +16,7 @@ int colorVal;
 int maxInterval = 10000;
 int interval = 1000;
 boolean [] materialArray = new boolean [maxInterval];
+boolean [] editMaterialArray = new boolean [maxInterval];
 
 int element_0 = 10; 
 int element_1 = 20;
@@ -61,7 +62,7 @@ void controlEvent(ControlEvent theControlEvent) {
     // min is at index 0, max is at index 1.
     element_0 = int(theControlEvent.getController().getArrayValue(0));
     element_1 = int(theControlEvent.getController().getArrayValue(1));
-    println("range update, done.");
+    // println("range update, done.");
     for (int i=0; i<interval; i++) {
       if (i%element_1 < element_0) materialArray[i] = true;
       else materialArray[i] = false;
@@ -77,7 +78,9 @@ void draw() {
   //make a pixel array
   for (int i=0; i<row; i++) {
     for (int j=0; j<column; j++) {
-      pixelBool[i][j] = materialArray[ (i*row+j) % interval ];
+      if(editMaterialArray[(i*row+j) % interval] == false){
+        pixelBool[i][j] = materialArray[ (i*row+j) % interval ];
+      }else pixelBool[i][j] = !materialArray[ (i*row+j) % interval ];
     }
   }
 
@@ -132,7 +135,7 @@ void mousePressed() {
     if ((xyPos) > interval) {
       xyPos = xyPos % interval;
     }
-    materialArray[xyPos] = !materialArray[xyPos];
+    editMaterialArray[xyPos] = !editMaterialArray[xyPos];
   }
 }
 
