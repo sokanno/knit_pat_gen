@@ -25,10 +25,7 @@ void setup() {
   size(rectSize + horizonMargin*2, rectSize + topMargin +bottomMargin);
   colorMode(RGB);
   cp5 = new ControlP5(this);
-  // presetSelector = cp5.addDropdownList("presetSelector")
-  //         .setPosition(horizonMargin, 40)
-  //         .setSize(100,230)
-  //         ;
+
   range = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
@@ -48,7 +45,7 @@ void setup() {
       .setSize(90, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-  // customize(presetSelector); // customize the first list
+
   img = createImage(row, column, HSB);
   textSize(10);
   for (int i=0; i<interval; i++) {
@@ -65,10 +62,10 @@ void controlEvent(ControlEvent theControlEvent) {
     element_0 = int(theControlEvent.getController().getArrayValue(0));
     element_1 = int(theControlEvent.getController().getArrayValue(1));
     println("range update, done.");
-  }
-  for (int i=0; i<interval; i++) {
-    if (i%element_1 < element_0) materialArray[i] = true;
-    else materialArray[i] = false;
+    for (int i=0; i<interval; i++) {
+      if (i%element_1 < element_0) materialArray[i] = true;
+      else materialArray[i] = false;
+    }
   }
 }
 
@@ -76,9 +73,6 @@ void draw() {
   background(96);
   // fill(255);
   // text("pattern generator for machine knitting", 30, 20);
-
-  //make a gingham check for default
-
 
   //make a pixel array
   for (int i=0; i<row; i++) {
