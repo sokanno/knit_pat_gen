@@ -5,6 +5,7 @@ pattern_gen
 ___________
 
 environment is processing 2.0.3
+
 this is a pattern generator for hacked knitting machine.
 you can make a two colors pattern displayed in black and white, 100 x 100px.
 (width and height of image is able to change in the code.)
