@@ -17,11 +17,11 @@ import java.io.IOException;
 public class pattern_gen extends PApplet {
 
 
-
 ControlP5 cp5;
 PImage img;
-// DropdownList presetSelector;
 Range range;
+PFont font;
+
 int row = 100;
 int column = 100;
 boolean [][] pixelBool = new boolean [row][column];
@@ -29,7 +29,7 @@ int rectSize = 500;
 int res = rectSize/row;
 int horizonMargin = 20;
 int topMargin = 20;
-int bottomMargin = 60;
+int bottomMargin = 100;
 int colorVal;
 int maxInterval = 10000;
 int interval = 1000;
@@ -43,8 +43,9 @@ int rangeLimit = 100;
 public void setup() {
   size(rectSize + horizonMargin*2, rectSize + topMargin +bottomMargin);
   colorMode(RGB);
+  font = loadFont("04b-03b-16.vlw");
+  textAlign(RIGHT, BOTTOM);
   cp5 = new ControlP5(this);
-
   range = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
@@ -64,7 +65,26 @@ public void setup() {
       .setSize(90, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-
+  cp5.addButton("left")
+    .setPosition(horizonMargin, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("right")
+    .setPosition(horizonMargin+40, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("up")
+    .setPosition(horizonMargin+80, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("down")
+    .setPosition(horizonMargin+120, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
   img = createImage(row, column, HSB);
   textSize(10);
   for (int i=0; i<interval; i++) {
@@ -75,6 +95,10 @@ public void setup() {
 
 public void draw() {
   background(96);
+  fill(40,50,100,80);
+  textFont(font, 16);
+  text("KNITTING PATTERN GENERATOR", 
+       rectSize+horizonMargin, rectSize+bottomMargin);
   //make a pixel array
   for (int i=0; i<row; i++) {
     for (int j=0; j<column; j++) {
@@ -127,6 +151,19 @@ public void keyPressed() {
     if (keyCode == UP && interval > row) interval-=row;
   }
   boolean [] materialArray = new boolean [interval];
+}
+
+public void left(){
+  if (interval > 1) interval--; 
+}
+public void right(){
+  if(interval < maxInterval) interval++;
+}
+public void up(){
+  if(interval > row) interval-=row;
+}
+public void down(){
+ if(interval < maxInterval) interval+=row; 
 }
 
 public void mousePressed() {

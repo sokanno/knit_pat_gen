@@ -1,9 +1,10 @@
-import controlP5.*;
 
+import controlP5.*;
 ControlP5 cp5;
 PImage img;
-// DropdownList presetSelector;
 Range range;
+PFont font;
+
 int row = 100;
 int column = 100;
 boolean [][] pixelBool = new boolean [row][column];
@@ -12,7 +13,7 @@ int rectSize = 500;
 int res = rectSize/row;
 int horizonMargin = 20;
 int topMargin = 20;
-int bottomMargin = 100;
+int bottomMargin = 140;
 int colorVal;
 int maxInterval = 10000;
 int interval = 1000;
@@ -28,8 +29,9 @@ boolean lifegameFlag = false;
 void setup() {
   size(rectSize + horizonMargin*2, rectSize + topMargin +bottomMargin);
   colorMode(RGB);
+  font = loadFont("04b-03b-16.vlw");
+  textAlign(RIGHT, BOTTOM);
   cp5 = new ControlP5(this);
-
   range = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
@@ -49,8 +51,28 @@ void setup() {
       .setSize(90, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-  cp5.addButton("lifegame")
+  cp5.addButton("left")
     .setPosition(horizonMargin, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("right")
+    .setPosition(horizonMargin+40, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("up")
+    .setPosition(horizonMargin+80, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("down")
+    .setPosition(horizonMargin+120, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("lifegame_23_3")
+    .setPosition(horizonMargin, rectSize+topMargin+100)
       .setSize(90, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
@@ -65,6 +87,10 @@ void setup() {
 
 void draw() {
   background(96);
+  fill(40,50,100,80);
+  textFont(font, 16);
+  text("KNITTING PATTERN GENERATOR", 
+       rectSize+horizonMargin, rectSize+bottomMargin);
   //make a pixel array
   if(!lifegameFlag){
     for (int i=0; i<row; i++) {
@@ -120,6 +146,26 @@ void keyPressed() {
     lifegameFlag = false;
   }
   boolean [] materialArray = new boolean [interval];
+  if (key == 'l'){
+    lifegame_23_3();
+  }
+}
+
+void left(){
+  if (interval > 1) interval--; 
+  lifegameFlag = false;
+}
+void right(){
+  if(interval < maxInterval) interval++;
+  lifegameFlag = false;
+}
+void up(){
+  if(interval > row) interval-=row;
+  lifegameFlag = false;
+}
+void down(){
+ if(interval < maxInterval) interval+=row; 
+ lifegameFlag = false;
 }
 
 void mousePressed() {
@@ -138,7 +184,7 @@ void mousePressed() {
   }
 }
 
-void lifegame(){
+void lifegame_23_3(){
   lifegameFlag = true;
 
   // // //end connect to the other end version (haven't done)
@@ -225,5 +271,7 @@ void fileOutput(File selection) {
     println("done saving");
   }
 }
+
+
 
 

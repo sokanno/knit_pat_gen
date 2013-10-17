@@ -1,9 +1,9 @@
 import controlP5.*;
-
 ControlP5 cp5;
 PImage img;
-// DropdownList presetSelector;
 Range range;
+PFont font;
+
 int row = 100;
 int column = 100;
 boolean [][] pixelBool = new boolean [row][column];
@@ -11,7 +11,7 @@ int rectSize = 500;
 int res = rectSize/row;
 int horizonMargin = 20;
 int topMargin = 20;
-int bottomMargin = 60;
+int bottomMargin = 100;
 int colorVal;
 int maxInterval = 10000;
 int interval = 1000;
@@ -25,8 +25,9 @@ int rangeLimit = 100;
 void setup() {
   size(rectSize + horizonMargin*2, rectSize + topMargin +bottomMargin);
   colorMode(RGB);
+  font = loadFont("04b-03b-16.vlw");
+  textAlign(RIGHT, BOTTOM);
   cp5 = new ControlP5(this);
-
   range = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
@@ -46,7 +47,26 @@ void setup() {
       .setSize(90, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-
+  cp5.addButton("left")
+    .setPosition(horizonMargin, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("right")
+    .setPosition(horizonMargin+40, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("up")
+    .setPosition(horizonMargin+80, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
+  cp5.addButton("down")
+    .setPosition(horizonMargin+120, rectSize+topMargin+60)
+      .setSize(30, 20)
+        .setColorBackground(color(0, 10, 100, 80))
+          ;
   img = createImage(row, column, HSB);
   textSize(10);
   for (int i=0; i<interval; i++) {
@@ -57,6 +77,10 @@ void setup() {
 
 void draw() {
   background(96);
+  fill(40,50,100,80);
+  textFont(font, 16);
+  text("KNITTING PATTERN GENERATOR", 
+       rectSize+horizonMargin, rectSize+bottomMargin);
   //make a pixel array
   for (int i=0; i<row; i++) {
     for (int j=0; j<column; j++) {
@@ -93,6 +117,7 @@ void controlEvent(ControlEvent theControlEvent) {
     // min is at index 0, max is at index 1.
     element_0 = int(theControlEvent.getController().getArrayValue(0));
     element_1 = int(theControlEvent.getController().getArrayValue(1));
+    if(element_1 == 0) element_1 = 1;
     // println("range update, done.");
     for (int i=0; i<interval; i++) {
       if (i%element_1 < element_0) materialArray[i] = true;
@@ -109,6 +134,19 @@ void keyPressed() {
     if (keyCode == UP && interval > row) interval-=row;
   }
   boolean [] materialArray = new boolean [interval];
+}
+
+void left(){
+  if (interval > 1) interval--; 
+}
+void right(){
+  if(interval < maxInterval) interval++;
+}
+void up(){
+  if(interval > row) interval-=row;
+}
+void down(){
+ if(interval < maxInterval) interval+=row; 
 }
 
 void mousePressed() {
