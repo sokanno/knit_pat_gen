@@ -22,7 +22,7 @@ ControlP5 cp5;
 PImage img;
 Range range;
 PFont font;
-
+Slider abc;
 int row = 100;
 int column = 100;
 boolean [][] pixelBool = new boolean [row][column];
@@ -42,6 +42,14 @@ int element_0 = 10;
 int element_1 = 20;
 int rangeLimit = 100;
 
+// variable for lifegame
+int sparseDefault = 2;
+int denseDefault = 4;
+
+int dense = 2;
+int sparse = 4;
+int birth = 3;
+
 boolean lifegameFlag = false;
 
 public void setup() {
@@ -50,7 +58,7 @@ public void setup() {
   font = loadFont("04b-03b-16.vlw");
   textAlign(RIGHT, BOTTOM);
   cp5 = new ControlP5(this);
-  range = cp5.addRange("rangeController")
+  range = cp5.addRange("White-Black")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
       .setPosition(horizonMargin, rectSize + topMargin+20)
@@ -63,7 +71,48 @@ public void setup() {
                   .setColorForeground(color(64, 124, 255, 90))
                     .setColorBackground(color(0, 10, 100, 80))  
                       ;        
-
+  range = cp5.addRange("range")
+    // disable broadcasting since setRange and setRangeValues will trigger an event
+    .setBroadcast(false) 
+      .setPosition(horizonMargin+60, rectSize + topMargin+100)
+        .setSize(100, 20)
+          .setHandleSize(10)
+            .setRange(0, 8)
+              .setRangeValues(dense,sparse)
+                // after the initialization we turn broadcast back on again
+                .setBroadcast(true)
+                  .setColorForeground(color(64, 124, 255, 90))
+                    .setColorBackground(color(0, 10, 100, 80))  
+                      ; 
+  cp5.addSlider("birth")
+    .setPosition(horizonMargin+200, rectSize + topMargin+100)
+      .setWidth(80)
+        .setRange(0,8) // values can range from big to small as well
+          .setValue(birth)
+            .setNumberOfTickMarks(9)
+              .setSliderMode(Slider.FLEXIBLE)
+                .setColorForeground(color(64, 124, 255, 90))
+                  .setColorBackground(color(0, 10, 100, 80))  
+                    ;
+                                
+  // cp5.addSlider("sparse")
+  //   .setPosition(horizonMargin+90, rectSize+topMargin+100)
+  //     .setWidth(70)
+  //       .setRange(0,7) // values can range from big to small as well
+  //         .setValue(sparseDefault)
+  //           .setNumberOfTickMarks(8)
+  //             // .setSliderMode(Slider.FLEXIBLE)
+  //               .setColorBackground(color(0, 10, 100, 80))  
+  //                 ;  
+  // cp5.addSlider("dense")
+  //   .setPosition(horizonMargin+200, rectSize+topMargin+100)
+  //     .setWidth(70)
+  //       .setRange(1,8) // values can range from big to small as well
+  //         .setValue(denseDefault)
+  //           .setNumberOfTickMarks(8)
+  //             // .setSliderMode(Slider.FLEXIBLE)
+  //               .setColorBackground(color(0, 10, 100, 80))  
+  //                 ;                    
   cp5.addButton("export_image")
     .setPosition(rectSize-70, rectSize+topMargin+20)
       .setSize(90, 20)
@@ -89,9 +138,9 @@ public void setup() {
       .setSize(30, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-  cp5.addButton("lifegame_23_3")
+  cp5.addButton("lifegame")
     .setPosition(horizonMargin, rectSize+topMargin+100)
-      .setSize(90, 20)
+      .setSize(50, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
   // customize(presetSelector); // customize the first list
@@ -107,7 +156,7 @@ public void draw() {
   background(96);
   fill(40,50,100,80);
   textFont(font, 16);
-  text("KNITTING PATTERN GENERATOR", 
+  text("PATTERN GENERATOR", 
        rectSize+horizonMargin, rectSize+bottomMargin);
   //make a pixel array
   if(!lifegameFlag){
@@ -140,7 +189,7 @@ public void draw() {
 }
 
 public void controlEvent(ControlEvent theControlEvent) {
-  if (theControlEvent.isFrom("rangeController")) {
+  if (theControlEvent.isFrom("White-Black")) {
     // min and max values are stored in an array.
     // access this array with controller().arrayValue().
     // min is at index 0, max is at index 1.
@@ -153,19 +202,36 @@ public void controlEvent(ControlEvent theControlEvent) {
       lifegameFlag = false;
     }
   }
+  // if(sparse >= dense) sparse = dense - 1; 
+  // if(dense <= sparse) dense = sparse + 1; 
+  if (theControlEvent.isFrom("range")) {
+    sparse = PApplet.parseInt(theControlEvent.getController().getArrayValue(0));
+    dense = PApplet.parseInt(theControlEvent.getController().getArrayValue(1));
+  }
 }
 
 public void keyPressed() {
   if (key == CODED) {
-    if (keyCode == RIGHT && interval < maxInterval) interval++;
-    if (keyCode == LEFT && interval > 1) interval--;	
-    if (keyCode == DOWN && interval < maxInterval) interval+=row;
-    if (keyCode == UP && interval > row) interval-=row;
-    lifegameFlag = false;
+    if (keyCode == RIGHT && interval < maxInterval) {
+      interval++;
+      lifegameFlag = false;
+    }
+    else if (keyCode == LEFT && interval > 1) {
+      interval--;	
+      lifegameFlag = false;
+    }
+    else if (keyCode == DOWN && interval < maxInterval) {
+      interval+=row;
+      lifegameFlag = false;
+    }
+    else if (keyCode == UP && interval > row) {
+      interval-=row;
+      lifegameFlag = false;
+    }
   }
   boolean [] materialArray = new boolean [interval];
-  if (key == 'l'){
-    lifegame_23_3();
+  if (key == 'l' ||key == 'L'){
+    lifegame();
   }
 }
 
@@ -200,9 +266,11 @@ public void mousePressed() {
     editMaterialArray[xyPos] = !editMaterialArray[xyPos];
     lifegameFlag = false;
   }
+  // print(sparse);
+  // println(dense);
 }
 
-public void lifegame_23_3(){
+public void lifegame(){
   lifegameFlag = true;
 
   // // //end connect to the other end version (haven't done)
@@ -247,28 +315,27 @@ public void lifegame_23_3(){
                  +lastPixelBool[i][j-1] + lastPixelBool[i][j+1]
                  +lastPixelBool[i+1][j-1] + lastPixelBool[i+1][j+1]
                  +lastPixelBool[i-1][j-1] + lastPixelBool[i-1][j+1];
-
-      if(pixelBool[i][j] == true){
-        if(state == 3 || state == 2){
+                      
+      if(pixelBool[i][j] == true){    
+        if(state < dense && state >= sparse){ //Survive
           pixelBool[i][j] = true;
         }
-        else if(state < 2){
+        else if(state < sparse){           //Depopulation
           pixelBool[i][j] = false;
         }
-        else if(state > 3){
+        else if(state >= dense){           //Congestion
           pixelBool[i][j] = false;
         }
-      }      
-      else if(pixelBool[i][j] == false && state == 3){
-        pixelBool[i][j] = true;
       }
+      else if(pixelBool[i][j] == false && state == birth){ //Birth                       
+        pixelBool[i][j] = true;
+      }        
       else{
         pixelBool[i][j] = false;
       }
     }
   }
 }
-
 
 public void export_image() {
   img.loadPixels();
