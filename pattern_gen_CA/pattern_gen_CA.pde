@@ -1,35 +1,37 @@
-
 import controlP5.*;
 ControlP5 cp5;
 PImage img;
 Range range;
 PFont font;
 Slider abc;
+
+//number of pixel of image
 int row = 100;
 int column = 100;
+
+//number of pixel to display
+int rectSize = 600;
+
 boolean [][] pixelBool = new boolean [row][column];
 int [][] lastPixelBool = new int [row][column];
-int rectSize = 500;
 int res = rectSize/row;
 int horizonMargin = 20;
 int topMargin = 20;
 int bottomMargin = 140;
 int colorVal;
-int maxInterval = 10000;
-int interval = 1000;
+int maxInterval = row * column;
+int interval = row * 10;
 boolean [] materialArray = new boolean [maxInterval];
 boolean [] editMaterialArray = new boolean [maxInterval];
 
+// variable for repetitive element
 int element_0 = 10; 
 int element_1 = 20;
 int rangeLimit = 100;
 
 // variable for lifegame
-int sparseDefault = 2;
-int denseDefault = 4;
-
-int dense = 2;
-int sparse = 4;
+int dense = 3;
+int sparse = 2;
 int birth = 3;
 
 boolean lifegameFlag = false;
@@ -60,7 +62,7 @@ void setup() {
         .setSize(100, 20)
           .setHandleSize(10)
             .setRange(0, 8)
-              .setRangeValues(dense,sparse)
+              .setRangeValues(sparse, dense)
                 // after the initialization we turn broadcast back on again
                 .setBroadcast(true)
                   .setColorForeground(color(64, 124, 255, 90))
@@ -75,26 +77,7 @@ void setup() {
               .setSliderMode(Slider.FLEXIBLE)
                 .setColorForeground(color(64, 124, 255, 90))
                   .setColorBackground(color(0, 10, 100, 80))  
-                    ;
-                                
-  // cp5.addSlider("sparse")
-  //   .setPosition(horizonMargin+90, rectSize+topMargin+100)
-  //     .setWidth(70)
-  //       .setRange(0,7) // values can range from big to small as well
-  //         .setValue(sparseDefault)
-  //           .setNumberOfTickMarks(8)
-  //             // .setSliderMode(Slider.FLEXIBLE)
-  //               .setColorBackground(color(0, 10, 100, 80))  
-  //                 ;  
-  // cp5.addSlider("dense")
-  //   .setPosition(horizonMargin+200, rectSize+topMargin+100)
-  //     .setWidth(70)
-  //       .setRange(1,8) // values can range from big to small as well
-  //         .setValue(denseDefault)
-  //           .setNumberOfTickMarks(8)
-  //             // .setSliderMode(Slider.FLEXIBLE)
-  //               .setColorBackground(color(0, 10, 100, 80))  
-  //                 ;                    
+                    ;                                             
   cp5.addButton("export_image")
     .setPosition(rectSize-70, rectSize+topMargin+20)
       .setSize(90, 20)
@@ -125,9 +108,7 @@ void setup() {
       .setSize(50, 20)
         .setColorBackground(color(0, 10, 100, 80))
           ;
-  // customize(presetSelector); // customize the first list
   img = createImage(row, column, HSB);
-  textSize(10);
   for (int i=0; i<interval; i++) {
     if (i%element_1 < element_0) materialArray[i] = true;
     else materialArray[i] = false;
@@ -136,6 +117,7 @@ void setup() {
 
 void draw() {
   background(96);
+  // noStroke();
   fill(40,50,100,80);
   textFont(font, 16);
   text("PATTERN GENERATOR", 
@@ -150,7 +132,6 @@ void draw() {
       }
     }
   }
-
   //draw the pixel array
   for (int i=0; i<row; i++) {
     for (int j=0; j<column; j++) {
@@ -172,9 +153,6 @@ void draw() {
 
 void controlEvent(ControlEvent theControlEvent) {
   if (theControlEvent.isFrom("White-Black")) {
-    // min and max values are stored in an array.
-    // access this array with controller().arrayValue().
-    // min is at index 0, max is at index 1.
     element_0 = int(theControlEvent.getController().getArrayValue(0));
     element_1 = int(theControlEvent.getController().getArrayValue(1));
     if(element_1 == 0) element_1 = 1;
@@ -184,8 +162,6 @@ void controlEvent(ControlEvent theControlEvent) {
       lifegameFlag = false;
     }
   }
-  // if(sparse >= dense) sparse = dense - 1; 
-  // if(dense <= sparse) dense = sparse + 1; 
   if (theControlEvent.isFrom("range")) {
     sparse = int(theControlEvent.getController().getArrayValue(0));
     dense = int(theControlEvent.getController().getArrayValue(1));
@@ -193,6 +169,7 @@ void controlEvent(ControlEvent theControlEvent) {
 }
 
 void keyPressed() {
+  // repetition interval can change by arrow key
   if (key == CODED) {
     if (keyCode == RIGHT && interval < maxInterval) {
       interval++;
@@ -212,11 +189,14 @@ void keyPressed() {
     }
   }
   boolean [] materialArray = new boolean [interval];
+
+  // typing l or L goes to Lifegame
   if (key == 'l' ||key == 'L'){
     lifegame();
   }
 }
 
+// repetition interval can change by GUI
 void left(){
   if (interval > 1) interval--; 
   lifegameFlag = false;
@@ -234,6 +214,7 @@ void down(){
  lifegameFlag = false;
 }
 
+// edit pixel by clicking
 void mousePressed() {
   if (mouseX >= horizonMargin 
     && mouseX <= rectSize + horizonMargin
@@ -248,8 +229,6 @@ void mousePressed() {
     editMaterialArray[xyPos] = !editMaterialArray[xyPos];
     lifegameFlag = false;
   }
-  // print(sparse);
-  // println(dense);
 }
 
 void lifegame(){
@@ -299,17 +278,17 @@ void lifegame(){
                  +lastPixelBool[i-1][j-1] + lastPixelBool[i-1][j+1];
                       
       if(pixelBool[i][j] == true){    
-        if(state < dense && state >= sparse){ //Survive
+        if(state <= dense && state >= sparse){ //Survive
           pixelBool[i][j] = true;
         }
-        else if(state < sparse){           //Depopulation
+        else if(state < sparse){              //Depopulation
           pixelBool[i][j] = false;
         }
-        else if(state >= dense){           //Congestion
+        else if(state > dense){              //Congestion
           pixelBool[i][j] = false;
         }
       }
-      else if(pixelBool[i][j] == false && state == birth){ //Birth                       
+      else if(pixelBool[i][j] == false && state == birth || state == 3){ //Birth                       
         pixelBool[i][j] = true;
       }        
       else{

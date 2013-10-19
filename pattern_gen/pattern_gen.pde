@@ -4,10 +4,14 @@ PImage img;
 Range range;
 PFont font;
 
+//number of pixel of image
 int row = 100;
 int column = 100;
+
+//number of pixel to display
+int rectSize = 600;
+
 boolean [][] pixelBool = new boolean [row][column];
-int rectSize = 500;
 int res = rectSize/row;
 int horizonMargin = 20;
 int topMargin = 20;
